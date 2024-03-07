@@ -1,5 +1,6 @@
 
 using AuctionService.Data;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuctionService {
@@ -15,6 +16,14 @@ namespace AuctionService {
             });
 
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            // cấu hình và đăng ký MassTransit, một thư viện giúp quản lý và triển khai các dịch vụ tương tác truyền tin trên hệ thống. 
+            // Trong trường hợp này, nó được cấu hình để sử dụng RabbitMQ làm bộ truyền tin
+            builder.Services.AddMassTransit(x => {
+                x.UsingRabbitMq((context, cfg) => {
+                    cfg.ConfigureEndpoints(context);
+                });
+            });
 
             var app = builder.Build();
 
