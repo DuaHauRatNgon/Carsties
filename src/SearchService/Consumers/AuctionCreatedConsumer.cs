@@ -5,6 +5,7 @@ using MongoDB.Entities;
 
 namespace SearchService;
 
+//
 // Đây là một consumer MassTransit được sử dụng để xử lý message khi một event "AuctionCreated" được gửi đến. 
 // Consumer này thực hiện ánh xạ massgage thành object Item, kiểm tra một điều kiện và sau đó lưu đối tượng vào cơ sở dữ liệu.
 // Đây là một consumer cụ thể được triển khai để xử lý thông điệp của loại AuctionCreated
