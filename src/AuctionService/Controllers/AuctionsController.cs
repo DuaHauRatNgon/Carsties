@@ -3,6 +3,8 @@ using AuctionService.DTOs;
 using AuctionService.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Contracts;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,38 +16,41 @@ public class AuctionsController : ControllerBase
 {
     private readonly AuctionDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public AuctionsController(AuctionDbContext context, IMapper mapper)
-    {
+    public AuctionsController(AuctionDbContext context, IMapper mapper, IPublishEndpoint publishEndpoint){
         _context = context;
         _mapper = mapper;
+        _publishEndpoint = publishEndpoint;
     }
 
-
+    //không hiểu sau action này không trả về api thành công :v
     // lấy danh sách đấu giá từ cơ sở dữ liệu, có thể lọc theo ngày cập nhật nếu có tham số date được truyền vào. 
     // Kết quả được ánh xạ sang đối tượng AuctionDto và trả về dưới dạng một ActionResult<List<AuctionDto>>.
-    [HttpGet]
-    public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions(string date)
-    {
-        var query = _context.Auctions.OrderBy(x => x.Item.Make).AsQueryable();
-
-        if (!string.IsNullOrEmpty(date))
-        {
-            query = query.Where(x => x.UpdatedAt.CompareTo(DateTime.Parse(date).ToUniversalTime()) > 0);
-        }
-
-        return await query.ProjectTo<AuctionDto>(_mapper.ConfigurationProvider).ToListAsync();
-    }
-
+    //action 1 (lỗi)
     // [HttpGet]
-    //     public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions() {
-    //         var auctions = await _context.Auctions
-    //             .Include(x => x.Item)
-    //             .OrderBy(x => x.Item.Make)
-    //             .ToListAsync();
+    // public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions(string date)
+    // {
+    //     var query = _context.Auctions.OrderBy(x => x.Item.Make).AsQueryable();
 
-    //         return _mapper.Map<List<AuctionDto>>(auctions);
+    //     if (!string.IsNullOrEmpty(date))
+    //     {
+    //         query = query.Where(x => x.UpdatedAt.CompareTo(DateTime.Parse(date).ToUniversalTime()) > 0);
     //     }
+
+    //     return await query.ProjectTo<AuctionDto>(_mapper.ConfigurationProvider).ToListAsync();
+    // }
+
+    //action 2 (chạy được)
+    [HttpGet]
+    public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions() {
+            var auctions = await _context.Auctions
+                .Include(x => x.Item)
+                .OrderBy(x => x.Item.Make)
+                .ToListAsync();
+
+            return _mapper.Map<List<AuctionDto>>(auctions);
+        }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<AuctionDto>> GetAuctionById(Guid id)
@@ -67,6 +72,10 @@ public class AuctionsController : ControllerBase
         auction.Seller = "Nguoi ban test";
 
         _context.Auctions.Add(auction);
+        
+        var newAuction = _mapper.Map<AuctionDto>(auction);
+
+        await _publishEndpoint.Publish(_mapper.Map<AuctionCreated>(newAuction));
 
         var result = await _context.SaveChangesAsync() > 0;
 
