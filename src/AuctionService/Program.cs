@@ -20,6 +20,18 @@ namespace AuctionService {
             // cấu hình và đăng ký MassTransit, một thư viện giúp quản lý và triển khai các dịch vụ tương tác truyền tin trên hệ thống. 
             // Trong trường hợp này, nó được cấu hình để sử dụng RabbitMQ làm bộ truyền tin
             builder.Services.AddMassTransit(x => {
+                //sử dụng Entity Framework Outbox để quản lý trạng thái gửi của các thông điệp
+                //Thêm dịch vụ Entity Framework Outbox vào MassTransit, sử dụng context của cơ sở dữ liệu AuctionDbContext.
+                x.AddEntityFrameworkOutbox<AuctionDbContext>(o =>{
+                    //Thiết lập thời gian chờ giữa các lần kiểm tra trạng thái gửi của thông điệp trong Outbox. Cấu hình thời gian chờ là 10 giây.
+                    o.QueryDelay = TimeSpan.FromSeconds(10);
+                    //Chọn loại csdl được sử dụng cho lưu trữ Outbox là PostgreSQL để lưu trữ các thông điệp và trạng thái gửi.
+                    o.UsePostgres();
+                    //Kích hoạt tính năng Bus Outbox trong Entity Framework Outbox. 
+                    //MassTransit sẽ sử dụng Entity Framework Outbox để theo dõi trạng thái gửi của các thông điệp trên Bus.
+                    o.UseBusOutbox();
+                });
+
                 x.UsingRabbitMq((context, cfg) => {
                     cfg.ConfigureEndpoints(context);
                 });
