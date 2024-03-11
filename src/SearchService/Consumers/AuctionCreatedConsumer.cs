@@ -22,7 +22,8 @@ public class AuctionCreatedConsumer : IConsumer<AuctionCreated> {
 
         var item = _mapper.Map<Item>(context.Message);
 
-        if (item.Model == "Mot hang xe nao do ...") throw new ArgumentException("khong the ban nhung xe co model la ...");
+        // ví dụ minh họa -> xử lí faults in our consumers.
+        if (item.Model == "Vinaxuki") throw new ArgumentException("khong the ban nhung xe co model la Vinaxuki");
 
         await item.SaveAsync();
     }

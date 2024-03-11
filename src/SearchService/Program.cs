@@ -35,6 +35,7 @@ builder.Services.AddMassTransit(x =>
         //Cấu hình một endpoint nhận các thông điệp trên RabbitMQ, trong trường hợp này là "search-auction-created".
         cfg.ReceiveEndpoint("search-auction-created", e => 
         {
+            //MESSAGE RETRY
             //Thiết lập chính sách thử lại cho endpoint, ở đây là thử lại sau mỗi 5 giây, và giữa các lần thử lại có thời gian đợi là 5 giây.
             e.UseMessageRetry(r => r.Interval(5, 5));
             //Cấu hình consumer cụ thể (trong trường hợp này là AuctionCreatedConsumer) để được sử dụng trong endpoint này.

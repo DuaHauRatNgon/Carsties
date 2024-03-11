@@ -32,6 +32,12 @@ namespace AuctionService {
                     o.UseBusOutbox();
                 });
 
+                //Tự động tìm và đăng ký tất cả các consumer trong namespace chứa AuctionCreatedFaultConsumer.
+                x.AddConsumersFromNamespaceContaining<AuctionCreatedFaultConsumer>();
+                // Đặt định dạng tên endpoint cho các endpoint được cấu hình trong MassTransit.
+                // Sử dụng định dạng Kebab Case (viết thường và ngăn cách bằng -) cho tên endpoint và thêm tiền tố "auction". false để chỉ định k viết hoa chữ cái đầu tiên 
+                x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
+
                 x.UsingRabbitMq((context, cfg) => {
                     cfg.ConfigureEndpoints(context);
                 });
