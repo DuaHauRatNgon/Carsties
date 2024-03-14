@@ -9,6 +9,7 @@ namespace IdentityService;
 
 internal static class HostingExtensions
 {
+    //Các phương thức này được sử dụng để cấu hình và thiết lập ứng dụng Identity Service trong một ứng dụng ASP.NET Core
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddRazorPages();
@@ -35,6 +36,11 @@ internal static class HostingExtensions
             .AddInMemoryApiScopes(Config.ApiScopes)
             .AddInMemoryClients(Config.Clients)
             .AddAspNetIdentity<ApplicationUser>();
+        
+        //Đặt SameSite thành Lax giúp bảo vệ ứng dụng khỏi các cuộc tấn công CSRF (Cross-Site Request Forgery) bằng cách ngăn chặn việc gửi cookie trong các yêu cầu từ các trang không tin cậy.
+        builder.Services.ConfigureApplicationCookie(options => {
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
         
         builder.Services.AddAuthentication();
 
