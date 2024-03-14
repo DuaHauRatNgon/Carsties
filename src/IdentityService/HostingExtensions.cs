@@ -35,7 +35,8 @@ internal static class HostingExtensions
             .AddInMemoryIdentityResources(Config.IdentityResources)
             .AddInMemoryApiScopes(Config.ApiScopes)
             .AddInMemoryClients(Config.Clients)
-            .AddAspNetIdentity<ApplicationUser>();
+            .AddAspNetIdentity<ApplicationUser>()
+            .AddProfileService<CustomProfileService>();     //muốn thêm các claim (vd fullname,..) đính kèm trong jwt trả về
         
         //Đặt SameSite thành Lax giúp bảo vệ ứng dụng khỏi các cuộc tấn công CSRF (Cross-Site Request Forgery) bằng cách ngăn chặn việc gửi cookie trong các yêu cầu từ các trang không tin cậy.
         builder.Services.ConfigureApplicationCookie(options => {
