@@ -2,6 +2,7 @@
 using AuctionService.Data;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AuctionService {
     public class Program {
@@ -43,12 +44,21 @@ namespace AuctionService {
                 });
             });
 
+            //cấu hình xác thực JWT (JSON Web Token) cho ứng dụng ASP.NET Core
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
+                options.Authority = builder.Configuration["IdentityServiceUrl"];    //Địa chỉ của Identity Server, nơi sẽ được sử dụng để xác thực token JWT. 
+                options.RequireHttpsMetadata = false;   //Xác định liệu việc sử dụng HTTPS là bắt buộc hay không
+                options.TokenValidationParameters.ValidateAudience = false;     //Xác định liệu token JWT cần được xác thực với audience (đối tượng nhận) hay không. 
+                options.TokenValidationParameters.NameClaimType = "username";   //Xác định loại claim chứa tên người dùng trong token JWT (username)
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
 
-            app.UseAuthorization();
+            app.UseAuthentication();
 
+            app.UseAuthorization();
 
             app.MapControllers();
 
