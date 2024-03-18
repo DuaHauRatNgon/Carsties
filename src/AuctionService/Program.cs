@@ -38,8 +38,14 @@ namespace AuctionService {
                 // Đặt định dạng tên endpoint cho các endpoint được cấu hình trong MassTransit.
                 // Sử dụng định dạng Kebab Case (viết thường và ngăn cách bằng -) cho tên endpoint và thêm tiền tố "auction". false để chỉ định k viết hoa chữ cái đầu tiên 
                 x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
-
+                
+                //sử dụng RabbitMQ làm message broker
                 x.UsingRabbitMq((context, cfg) => {
+                    cfg.Host(builder.Configuration["RabbitMq:Host"], "/", host =>
+                    {
+                        host.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest"));
+                        host.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest"));
+                    });
                     cfg.ConfigureEndpoints(context);
                 });
             });
