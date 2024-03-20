@@ -25,3 +25,8 @@ public class Index : PageModel
     }
     public IdentityServerLicense? License { get; }
 }
+
+//hạ version Duende.IdentityServer.AspNetIdentity 7 -> 6 thì lỗi cái này :v
+public class IdentityServerLicense
+{
+}

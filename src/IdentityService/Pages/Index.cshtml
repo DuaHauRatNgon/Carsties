@@ -33,7 +33,8 @@
         </li>
     </ul>
 
-    @if(Model.License != null)
+    @* hạ version Duende.IdentityServer.AspNetIdentity 7 -> 6 thì lỗi cái này :v *@
+    @* @if(Model.License != null)
     {
         <h2>License</h2>
         <dl>
@@ -42,5 +43,5 @@
             <dt>Expiration</dt>
             <dd>@Model.License.Expiration!.Value.ToLongDateString()</dd>
         </dl>
-    }
+    } *@
 </div>
