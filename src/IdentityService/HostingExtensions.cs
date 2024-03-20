@@ -28,6 +28,14 @@ internal static class HostingExtensions
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
+                
+                //Nếu ứng dụng đang chạy trong môi trường Docker, thiết lập IssuerUri của Identity Server thành "identity-svc"
+                //thay vì "http://localhost:5000"
+                // /IssuerUri là URI của Identity Server, nơi mà các ứng dụng khác có thể truy cập để xác thực người dùng 
+                //và nhận thông tin về các tài nguyên được bảo vệ.
+                if (builder.Environment.IsEnvironment("Docker")){
+                    options.IssuerUri = "identity-svc";
+                }
 
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 // options.EmitStaticAudienceClaim = true;
