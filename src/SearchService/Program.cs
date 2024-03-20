@@ -32,6 +32,12 @@ builder.Services.AddMassTransit(x =>
     //Cấu hình MassTransit để sử dụng RabbitMQ làm bộ truyền tin.
     x.UsingRabbitMq((context, cfg) => 
     {
+        cfg.Host(builder.Configuration["RabbitMq:Host"], "/", host =>
+        {
+            host.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest"));
+            host.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest"));
+        });
+
         //Cấu hình một endpoint nhận các thông điệp trên RabbitMQ, trong trường hợp này là "search-auction-created".
         cfg.ReceiveEndpoint("search-auction-created", e => 
         {
