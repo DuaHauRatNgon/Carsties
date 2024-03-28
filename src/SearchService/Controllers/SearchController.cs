@@ -20,7 +20,7 @@ public class SearchController : ControllerBase
         // Nếu là "new", sẽ sắp xếp kết quả theo thời gian tạo mới nhất (CreatedAt) theo thứ tự giảm dần. 
         // Trong trường hợp còn lại, nếu không khớp với bất kỳ giá trị nào, sẽ sắp xếp kết quả theo trường AuctionEnd theo thứ tự tăng dần.
         query = searchParams.OrderBy switch{
-            "make" => query.Sort(x => x.Ascending(a => a.Make)),
+            "make" => query.Sort(x => x.Ascending(a => a.Make)).Sort(x => x.Ascending(a => a.Model)),        
             "new" => query.Sort(x => x.Descending(a => a.CreatedAt)),
             _ => query.Sort(x => x.Ascending(a => a.AuctionEnd))
         };
